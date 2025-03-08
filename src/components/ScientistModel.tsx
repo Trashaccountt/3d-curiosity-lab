@@ -1,6 +1,6 @@
 
 import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
@@ -173,23 +173,33 @@ const CuriousKid = ({ position = [0, 0, 0] }: CharacterProps) => {
   );
 };
 
+const SceneContent = () => {
+  return (
+    <>
+      <ambientLight intensity={0.5} />
+      <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+      <pointLight position={[-10, -10, -10]} />
+      
+      <Scientist />
+      <Physicist position={[-2, 0, 0]} />
+      <CuriousKid position={[2, 0, 0]} />
+    </>
+  );
+};
+
 const ThreeCharacters = () => {
   return (
     <div className="w-full h-[400px] relative glass rounded-xl overflow-hidden">
       <div className="canvas-container w-full h-full">
-        <OrbitControls
-          enableZoom={false}
-          enablePan={false}
-          autoRotate
-          autoRotateSpeed={1}
-        />
-        <ambientLight intensity={0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-        <pointLight position={[-10, -10, -10]} />
-        
-        <Scientist />
-        <Physicist position={[-2, 0, 0]} />
-        <CuriousKid position={[2, 0, 0]} />
+        <Canvas>
+          <SceneContent />
+          <OrbitControls
+            enableZoom={false}
+            enablePan={false}
+            autoRotate
+            autoRotateSpeed={1}
+          />
+        </Canvas>
       </div>
     </div>
   );
