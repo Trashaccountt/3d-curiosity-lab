@@ -1,212 +1,192 @@
 
-import { useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, PresentationControls, Environment, ContactShadows } from '@react-three/drei';
-import { gsap } from 'gsap';
+import { useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
+import * as THREE from 'three';
 
-// The actual 3D model component (we'll use a placeholder box since we don't have a real model)
-const ScientistFigure = ({ onInteraction, isActive }) => {
-  const meshRef = useRef();
-  const [hovered, setHovered] = useState(false);
-  
-  useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : 'auto';
-  }, [hovered]);
-  
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
+const Scientist = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const headRef = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    
     if (meshRef.current) {
-      // Idle animation
-      meshRef.current.rotation.y = Math.sin(t / 4) * 0.3;
-      meshRef.current.position.y = Math.sin(t / 2) * 0.1;
-      
-      // Hover animation
-      if (hovered) {
-        gsap.to(meshRef.current.scale, { x: 1.1, y: 1.1, z: 1.1, duration: 0.2 });
-      } else {
-        gsap.to(meshRef.current.scale, { x: 1, y: 1, z: 1, duration: 0.2 });
+      // Safe access to rotation and position properties
+      if (meshRef.current.rotation) {
+        meshRef.current.rotation.y = Math.sin(t / 4) * 0.3;
+      }
+      if (meshRef.current.position) {
+        meshRef.current.position.y = Math.sin(t / 2) * 0.1 + 0.1;
+      }
+    }
+    
+    if (headRef.current) {
+      // Safe access to scale property
+      if (headRef.current.scale) {
+        headRef.current.scale.x = 0.5;
+        headRef.current.scale.y = 0.5;
+        headRef.current.scale.z = 0.5;
       }
       
-      // Active animation
-      if (isActive) {
-        gsap.to(meshRef.current.rotation, { z: Math.PI * 2, duration: 1.5, repeat: -1 });
-      } else {
-        gsap.killTweensOf(meshRef.current.rotation);
+      // Safe access to rotation property
+      if (headRef.current.rotation) {
+        headRef.current.rotation.y = Math.sin(t / 3) * 0.2;
+        headRef.current.rotation.x = Math.sin(t / 4) * 0.1;
       }
     }
   });
-  
+
   return (
-    <group onClick={() => onInteraction('scientist')}>
-      {/* Placeholder for scientist model */}
-      <mesh
-        ref={meshRef}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        position={[0, 0, 0]}
-      >
-        <boxGeometry args={[1, 2, 1]} />
-        <meshStandardMaterial color={isActive ? "#4f46e5" : "#3b82f6"} />
+    <group position={[0, 0, 0]}>
+      {/* Body */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.5, 1.2, 16]} />
+        <meshStandardMaterial color="#6366f1" />
       </mesh>
-      {/* Lab equipment (beakers, etc) */}
-      <mesh position={[1.5, -0.5, 0]}>
-        <cylinderGeometry args={[0.3, 0.3, 0.8, 16]} />
-        <meshStandardMaterial color="#60a5fa" transparent opacity={0.7} />
+      
+      {/* Head */}
+      <mesh ref={headRef} position={[0, 0.9, 0]}>
+        <sphereGeometry args={[0.5, 32, 32]} />
+        <meshStandardMaterial color="#818cf8" />
       </mesh>
-      <mesh position={[1.2, -0.7, 0.5]}>
-        <cylinderGeometry args={[0.2, 0.2, 0.5, 16]} />
-        <meshStandardMaterial color="#93c5fd" transparent opacity={0.6} />
+      
+      {/* Glasses */}
+      <mesh position={[0, 0.9, 0.3]}>
+        <boxGeometry args={[0.6, 0.1, 0.1]} />
+        <meshStandardMaterial color="#000000" />
       </mesh>
     </group>
   );
 };
 
-// Physicist figure (placeholder)
-const PhysicistFigure = ({ onInteraction, isActive }) => {
-  const meshRef = useRef();
-  const [hovered, setHovered] = useState(false);
-  
-  useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : 'auto';
-  }, [hovered]);
-  
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (meshRef.current) {
-      // Idle animation
-      meshRef.current.rotation.y = Math.sin(t / 3) * 0.4;
-      meshRef.current.position.y = Math.sin(t / 2.5) * 0.1;
-      
-      // Active animation
-      if (isActive) {
-        gsap.to(meshRef.current.rotation, { x: Math.PI * 2, duration: 2, repeat: -1 });
-      } else {
-        gsap.killTweensOf(meshRef.current.rotation);
-      }
-    }
-  });
-  
-  return (
-    <group onClick={() => onInteraction('physicist')}>
-      {/* Placeholder for physicist model */}
-      <mesh
-        ref={meshRef}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        position={[0, 0, 0]}
-      >
-        <dodecahedronGeometry args={[1, 0]} />
-        <meshStandardMaterial color={isActive ? "#7c3aed" : "#6366f1"} />
-      </mesh>
-      {/* Atoms orbiting */}
-      <group rotation={[0, t => Math.sin(t / 2), 0]}>
-        <mesh position={[0, 0, 1.5]}>
-          <sphereGeometry args={[0.1, 16, 16]} />
-          <meshStandardMaterial color="#818cf8" emissive="#4f46e5" emissiveIntensity={2} />
-        </mesh>
-        <mesh position={[1.5, 0, 0]}>
-          <sphereGeometry args={[0.1, 16, 16]} />
-          <meshStandardMaterial color="#818cf8" emissive="#4f46e5" emissiveIntensity={2} />
-        </mesh>
-        <mesh position={[0, 1.5, 0]}>
-          <sphereGeometry args={[0.1, 16, 16]} />
-          <meshStandardMaterial color="#818cf8" emissive="#4f46e5" emissiveIntensity={2} />
-        </mesh>
-      </group>
-    </group>
-  );
-};
+const Physicist = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const armRef = useRef<THREE.Mesh>(null);
 
-// Curious kid figure
-const CuriousKidFigure = ({ onInteraction, isActive }) => {
-  const meshRef = useRef();
-  const [hovered, setHovered] = useState(false);
-  
-  useEffect(() => {
-    document.body.style.cursor = hovered ? 'pointer' : 'auto';
-  }, [hovered]);
-  
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    
     if (meshRef.current) {
-      // Idle animation - more energetic for the kid
-      meshRef.current.rotation.y = Math.sin(t / 2) * 0.5;
-      meshRef.current.position.y = Math.sin(t * 1.5) * 0.15;
-      
-      // Active animation
-      if (isActive) {
-        gsap.to(meshRef.current.position, { y: 1, duration: 0.5, yoyo: true, repeat: -1 });
-      } else {
-        gsap.killTweensOf(meshRef.current.position);
+      // Safe access to rotation and position properties
+      if (meshRef.current.rotation) {
+        meshRef.current.rotation.y = Math.sin(t / 3) * 0.3;
+      }
+      if (meshRef.current.position) {
+        meshRef.current.position.y = Math.sin(t / 2) * 0.1;
+      }
+    }
+    
+    if (armRef.current) {
+      // Safe access to rotation property
+      if (armRef.current.rotation) {
+        armRef.current.rotation.z = Math.sin(t) * 0.2;
+        armRef.current.rotation.x = Math.sin(t / 2) * 0.1;
       }
     }
   });
-  
+
   return (
-    <group onClick={() => onInteraction('kid')}>
-      {/* Placeholder for kid model */}
-      <mesh
-        ref={meshRef}
-        onPointerOver={() => setHovered(true)}
-        onPointerOut={() => setHovered(false)}
-        position={[0, 0, 0]}
-      >
-        <sphereGeometry args={[0.8, 16, 16]} />
-        <meshStandardMaterial color={isActive ? "#ec4899" : "#f472b6"} />
+    <group position={[0, 0, 0]}>
+      {/* Body */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.3, 0.5, 1.2, 16]} />
+        <meshStandardMaterial color="#2563eb" />
       </mesh>
-      {/* Toy or discovery object */}
-      <mesh position={[1, -0.2, 0.5]} rotation={[0, 0, Math.PI / 4]}>
-        <torusGeometry args={[0.3, 0.1, 16, 32]} />
-        <meshStandardMaterial color="#fb7185" />
+      
+      {/* Head */}
+      <mesh position={[0, 0.9, 0]}>
+        <sphereGeometry args={[0.4, 32, 32]} />
+        <meshStandardMaterial color="#60a5fa" />
+      </mesh>
+      
+      {/* Arm */}
+      <mesh ref={armRef} position={[0.4, 0.3, 0]}>
+        <boxGeometry args={[0.6, 0.1, 0.1]} />
+        <meshStandardMaterial color="#93c5fd" />
+      </mesh>
+      
+      {/* Floating Formula */}
+      <mesh position={[0.8, 0.3, 0]} rotation={[0, 0, Math.PI / 4]}>
+        <torusGeometry args={[0.1, 0.03, 16, 32]} />
+        <meshStandardMaterial color="#dbeafe" emissive="#dbeafe" emissiveIntensity={0.5} />
       </mesh>
     </group>
   );
 };
 
-// The main component that combines all three characters
+const CuriousKid = () => {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const headRef = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const t = clock.getElapsedTime();
+    
+    if (meshRef.current) {
+      // Safe access to rotation and position properties
+      if (meshRef.current.rotation) {
+        meshRef.current.rotation.y = Math.sin(t / 2) * 0.5;
+      }
+      if (meshRef.current.position) {
+        meshRef.current.position.y = Math.sin(t / 1.5) * 0.15 + 0.15;
+      }
+    }
+    
+    if (headRef.current) {
+      // Safe access to position property
+      if (headRef.current.position) {
+        headRef.current.position.x = Math.sin(t / 1) * 0.1;
+        headRef.current.position.z = Math.cos(t / 1) * 0.1;
+      }
+    }
+  });
+
+  return (
+    <group position={[0, 0, 0]}>
+      {/* Body */}
+      <mesh ref={meshRef} position={[0, 0, 0]}>
+        <cylinderGeometry args={[0.25, 0.4, 0.9, 16]} />
+        <meshStandardMaterial color="#db2777" />
+      </mesh>
+      
+      {/* Head */}
+      <mesh ref={headRef} position={[0, 0.7, 0]}>
+        <sphereGeometry args={[0.35, 32, 32]} />
+        <meshStandardMaterial color="#f472b6" />
+      </mesh>
+      
+      {/* Eyes */}
+      <mesh position={[0.1, 0.75, 0.2]}>
+        <sphereGeometry args={[0.05, 16, 16]} />
+        <meshStandardMaterial color="#000000" />
+      </mesh>
+      
+      <mesh position={[-0.1, 0.75, 0.2]}>
+        <sphereGeometry args={[0.05, 16, 16]} />
+        <meshStandardMaterial color="#000000" />
+      </mesh>
+    </group>
+  );
+};
+
 const ThreeCharacters = () => {
-  const [activeCharacter, setActiveCharacter] = useState(null);
-  
-  const handleInteraction = (character) => {
-    setActiveCharacter(character);
-    // We could use this to trigger specific animations or information displays
-  };
-  
   return (
-    <div className="w-full h-[40vh] md:h-[50vh]">
-      <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 10], fov: 50 }}>
+    <div className="w-full h-[400px] relative glass rounded-xl overflow-hidden">
+      <div className="canvas-container w-full h-full">
+        <OrbitControls
+          enableZoom={false}
+          enablePan={false}
+          autoRotate
+          autoRotateSpeed={1}
+        />
         <ambientLight intensity={0.5} />
-        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} intensity={1} castShadow />
-        <PresentationControls
-          global
-          config={{ mass: 2, tension: 300 }}
-          snap={{ mass: 4, tension: 150 }}
-          rotation={[0, 0, 0]}
-          polar={[-Math.PI / 4, Math.PI / 4]}
-          azimuth={[-Math.PI / 4, Math.PI / 4]}
-        >
-          <group position={[-4, 0, 0]}>
-            <ScientistFigure 
-              onInteraction={handleInteraction} 
-              isActive={activeCharacter === 'scientist'} 
-            />
-          </group>
-          <group position={[0, 0, 0]}>
-            <PhysicistFigure 
-              onInteraction={handleInteraction} 
-              isActive={activeCharacter === 'physicist'} 
-            />
-          </group>
-          <group position={[4, 0, 0]}>
-            <CuriousKidFigure 
-              onInteraction={handleInteraction} 
-              isActive={activeCharacter === 'kid'} 
-            />
-          </group>
-        </PresentationControls>
-        <ContactShadows position={[0, -2, 0]} opacity={0.5} scale={10} blur={1.5} far={5} />
-        <Environment preset="city" />
-      </Canvas>
+        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+        <pointLight position={[-10, -10, -10]} />
+        
+        <Scientist />
+        <Physicist position={[-2, 0, 0]} />
+        <CuriousKid position={[2, 0, 0]} />
+      </div>
     </div>
   );
 };

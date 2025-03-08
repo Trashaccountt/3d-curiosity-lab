@@ -9,6 +9,7 @@ import AboutSection from '../components/sections/AboutSection';
 import ProjectsSection from '../components/sections/ProjectsSection';
 import ExperienceSection from '../components/sections/ExperienceSection';
 import SkillsSection from '../components/sections/SkillsSection';
+import HobbiesSection from '../components/sections/HobbiesSection';
 import ContactSection from '../components/sections/ContactSection';
 import Footer from '../components/sections/Footer';
 
@@ -22,6 +23,7 @@ const Index = () => {
     { label: 'Projects', href: '#projects' },
     { label: 'Experience', href: '#experience' },
     { label: 'Skills', href: '#skills' },
+    { label: 'Hobbies', href: '#hobbies' },
     { label: 'Contact', href: '#contact' }
   ];
   
@@ -53,6 +55,9 @@ const Index = () => {
       
       {/* Skills Section */}
       <SkillsSection />
+      
+      {/* Hobbies Section */}
+      <HobbiesSection />
       
       {/* Contact Section */}
       <ContactSection />
