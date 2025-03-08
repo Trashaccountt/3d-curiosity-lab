@@ -164,9 +164,62 @@
     opacity: 0.5;
     background: radial-gradient(
       circle,
-      rgba(var(--primary), 0.4) 0%,
-      rgba(var(--primary), 0) 70%
+      rgba(59, 130, 246, 0.4) 0%,
+      rgba(59, 130, 246, 0) 70%
     );
     transition: transform 0.1s ease-out;
+  }
+  
+  /* Code-inspired background elements */
+  .code-line {
+    position: relative;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+    margin: 10px 0;
+  }
+  
+  .code-block {
+    position: relative;
+    border-radius: 8px;
+    @apply bg-white/5 backdrop-blur-sm border border-white/10;
+    overflow: hidden;
+  }
+  
+  .code-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      transparent,
+      transparent 23px,
+      rgba(59, 130, 246, 0.03) 23px,
+      rgba(59, 130, 246, 0.03) 24px
+    );
+  }
+  
+  /* Matrix-like animation for cybersecurity theme */
+  @keyframes matrix-fall {
+    0% {
+      transform: translateY(-100%);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh);
+      opacity: 0;
+    }
+  }
+  
+  .matrix-text {
+    position: fixed;
+    color: rgba(59, 130, 246, 0.7);
+    font-family: monospace;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: -1;
+    animation: matrix-fall linear infinite;
+    text-shadow: 0 0 5px rgba(59, 130, 246, 0.7);
   }
 }

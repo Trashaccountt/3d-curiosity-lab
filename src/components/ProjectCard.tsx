@@ -2,6 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { gsap } from 'gsap';
+import { Github, ExternalLink } from 'lucide-react';
 
 interface ProjectCardProps {
   title: string;
@@ -9,9 +10,10 @@ interface ProjectCardProps {
   image: string;
   technologies: string[];
   link: string;
+  github?: string;
 }
 
-const ProjectCard = ({ title, description, image, technologies, link }: ProjectCardProps) => {
+const ProjectCard = ({ title, description, image, technologies, link, github }: ProjectCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   
@@ -106,17 +108,36 @@ const ProjectCard = ({ title, description, image, technologies, link }: ProjectC
         <h3 className="text-xl font-bold mb-2 text-gradient">{title}</h3>
         <p className="text-sm text-foreground/80 mb-4">{description}</p>
         
-        {/* View project button */}
-        <motion.a
-          href={link}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-block px-4 py-2 rounded-lg bg-primary text-white transition-all duration-300 hover:bg-primary/80"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          View Project
-        </motion.a>
+        {/* Project links */}
+        <div className="flex gap-3">
+          {/* View project button */}
+          <motion.a
+            href={link}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center px-4 py-2 rounded-lg bg-primary text-white transition-all duration-300 hover:bg-primary/80"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <span>Demo</span>
+            <ExternalLink className="ml-2 w-4 h-4" />
+          </motion.a>
+          
+          {/* GitHub link */}
+          {github && (
+            <motion.a
+              href={github}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center px-4 py-2 rounded-lg bg-secondary text-white transition-all duration-300 hover:bg-secondary/80"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span>GitHub</span>
+              <Github className="ml-2 w-4 h-4" />
+            </motion.a>
+          )}
+        </div>
       </div>
       
       {/* 3D layered elements for depth */}

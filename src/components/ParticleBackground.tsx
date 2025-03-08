@@ -7,8 +7,8 @@ import { useMemo } from 'react';
 import { gsap } from 'gsap';
 
 // Particles component that renders thousands of small dots
-const Particles = ({ count = 5000, mouse }) => {
-  const mesh = useRef();
+const Particles = ({ count = 5000, mouse }: { count: number, mouse: React.RefObject<{x: number, y: number}> }) => {
+  const mesh = useRef<THREE.Points>(null);
   const { viewport, size } = useThree();
   
   // Create a large array of random particles
@@ -60,7 +60,7 @@ const Particles = ({ count = 5000, mouse }) => {
     }
     
     // Mouse interaction
-    if (mouse.current) {
+    if (mouse.current && mesh.current) {
       mesh.current.rotation.x = THREE.MathUtils.lerp(mesh.current.rotation.x, mouse.current.y * 0.2, 0.1);
       mesh.current.rotation.y = THREE.MathUtils.lerp(mesh.current.rotation.y, mouse.current.x * 0.2, 0.1);
     }
@@ -83,11 +83,11 @@ const Particles = ({ count = 5000, mouse }) => {
 
 // Main component that creates a fullscreen canvas with particles
 const ParticleBackground = () => {
-  const canvasRef = useRef();
-  const mouseRef = useRef({ x: 0, y: 0 });
+  const canvasRef = useRef<HTMLDivElement | null>(null);
+  const mouseRef = useRef<{ x: number, y: number }>({ x: 0, y: 0 });
   
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       // Normalize mouse position to -1 to 1
       mouseRef.current = {
         x: (e.clientX / window.innerWidth) * 2 - 1,
@@ -110,11 +110,13 @@ const ParticleBackground = () => {
     handleResize();
 
     // Animate the canvas opacity
-    gsap.fromTo(
-      canvasRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 2, ease: "power2.out" }
-    );
+    if (canvasRef.current) {
+      gsap.fromTo(
+        canvasRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 2, ease: "power2.out" }
+      );
+    }
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
@@ -129,7 +131,7 @@ const ParticleBackground = () => {
         <fog attach="fog" args={["#030712", 5, 30]} />
         <ambientLight intensity={0.3} />
         <directionalLight position={[10, 10, 5]} intensity={0.8} />
-        <Particles mouse={mouseRef} />
+        <Particles mouse={mouseRef} count={5000} />
       </Canvas>
     </div>
   );
