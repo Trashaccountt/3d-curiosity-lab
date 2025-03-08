@@ -4,7 +4,11 @@ import { useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 
-const Scientist = () => {
+interface CharacterProps {
+  position?: [number, number, number];
+}
+
+const Scientist = ({ position = [0, 0, 0] }: CharacterProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const headRef = useRef<THREE.Mesh>(null);
 
@@ -38,7 +42,7 @@ const Scientist = () => {
   });
 
   return (
-    <group position={[0, 0, 0]}>
+    <group position={position}>
       {/* Body */}
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <cylinderGeometry args={[0.3, 0.5, 1.2, 16]} />
@@ -60,7 +64,7 @@ const Scientist = () => {
   );
 };
 
-const Physicist = () => {
+const Physicist = ({ position = [0, 0, 0] }: CharacterProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const armRef = useRef<THREE.Mesh>(null);
 
@@ -87,7 +91,7 @@ const Physicist = () => {
   });
 
   return (
-    <group position={[0, 0, 0]}>
+    <group position={position}>
       {/* Body */}
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <cylinderGeometry args={[0.3, 0.5, 1.2, 16]} />
@@ -115,7 +119,7 @@ const Physicist = () => {
   );
 };
 
-const CuriousKid = () => {
+const CuriousKid = ({ position = [0, 0, 0] }: CharacterProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const headRef = useRef<THREE.Mesh>(null);
 
@@ -142,7 +146,7 @@ const CuriousKid = () => {
   });
 
   return (
-    <group position={[0, 0, 0]}>
+    <group position={position}>
       {/* Body */}
       <mesh ref={meshRef} position={[0, 0, 0]}>
         <cylinderGeometry args={[0.25, 0.4, 0.9, 16]} />
